@@ -1,0 +1,32 @@
+#!/bin/bash
+echo "🔥 Thiết lập Catalyst build environment..."
+
+# Tạo thư mục catalyst
+mkdir -p /var/tmp/catalyst/{builds,snapshots,packages}
+chown -R gentoo:gentoo /var/tmp/catalyst
+
+# Cấu hình catalyst
+cat > /etc/catalyst/catalyst.conf << 'EOF'
+digests="sha512 sha256"
+options="-p4"
+hash_function="crc32"
+source_subpath="gentoo"
+version_subpath="releases/amd64/autobuilds"
+storedir="/var/tmp/catalyst/builds"
+snapshot_cache="/var/tmp/catalyst/snapshots"
+portage_confdir="/var/lib/catalyst"
+portage_tmpdir="/var/tmp"
+distdir="/var/cache/distfiles"
+packages="/var/tmp/catalyst/packages"
+envscript="/etc/catalyst/catalystrc"
+EOF
+
+# Catalyst environment
+cat > /etc/catalyst/catalystrc << 'EOF'
+CFLAGS="-O2 -pipe -march=native"
+CXXFLAGS="${CFLAGS}"
+MAKEOPTS="-j4"
+EMERGE_DEFAULT_OPTS="--jobs=4 --load-average=4"
+EOF
+
+echo "✅ Catalyst setup complete!"
